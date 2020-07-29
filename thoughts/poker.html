@@ -1,6 +1,7 @@
 <html>
 <head>
   <link rel="stylesheet" href="../static/style.css">
+  <link rel="stylesheet" href="../static/poker.css">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>poker odds</title>
@@ -15,16 +16,21 @@
     <p>
       <b>poker odds</b>
     </p>
-    <div style="display: grid; grid-template-columns: auto auto;">
+    <p>
+
+    </p>
+    <div class="pokerContainer">
       <form id="form" onsubmit="process(event)">
+        <label for="hands">hands:</label><br>
+        <input type="text" name="hands" placeholder="ex: Ac,4d Kc,Js"><br><br>
+
         <label for="numPlayers">numPlayers:</label><br>
-        <input type="text" name="numPlayers" placeholder="Defaults to number of hands. Can be greater"><br><br>
+        <input type="text" name="numPlayers" placeholder="Defaults to # of hands"><br><br>
+
+        <hr><br>
 
         <label for="numDecks">numDecks:</label><br>
         <input type="text" name="numDecks" placeholder="Defaults to 1"><br><br>
-
-        <label for="hands">hands:</label><br>
-        <input type="text" name="hands" placeholder="ex: Ac,4d Kc,Js"><br><br>
 
         <label for="handSize">handSize:</label><br>
         <input type="text" name="handSize" placeholder="Defaults to 2"><br><br>
@@ -47,7 +53,7 @@
         <input type="submit">
       </form>
 
-      <pre id="output" style="font-size: 80%;"></pre>
+      <pre id="output"></pre>
     </div>
 
 
@@ -86,25 +92,24 @@
       }
     }
 
-    document.getElementById('output').textContent = 'Loading...';
+    const output = document.getElementById('output');
 
-    makeRequest(url + args.join('&'))
+    output.textContent = 'Loading...';
+
+    fetch(url + args.join('&'))
     .then(res => {
-      document.getElementById('output').textContent = JSON.stringify(res, null, 2);
+      return res.json();
+    })
+    .then(res => {
+      console.log(res)
+      if (res.error)
+        output.textContent = `Error: \n\t${res.error.substring(0, res.error.length).replace(/\\/g, '')}`;
+      else
+        output.textContent = JSON.stringify(res, null, 2);
     })
     .catch(err => {
-      document.getElementById('output').textContent = err;
+      output.textContent = err;
     });
-  }
-
-  async function makeRequest(url) {
-    const res = await fetch(url);
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text);
-    } else {
-      return res.json();
-    }
   }
 
   // TODO: put google analytics stuffs here
