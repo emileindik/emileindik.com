@@ -1,12 +1,20 @@
 body {
   font-family: Helvetica;
   color: #333333;
-  background-color: #fffef7;
+  background-color: #fffcf3;
   font-size: 16px;
   margin-left: 15%;
   margin-right: 5%;
   margin-top: 40px;
   margin-bottom: 40px;
+}
+
+a {
+  color: rgb(46, 30, 139);
+}
+
+a:visited {
+  color: rgb(84, 84, 88);
 }
 
 .container {
