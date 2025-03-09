@@ -17,7 +17,7 @@
       <b>Poker odds API</b>
     </p>
     <p>
-      A little tool motivated by an interest in poker and in APIs. The odds calculator package is on Github <a href="https://github.com/emileindik/poker-odds-machine" target="_blank" rel="noopener noreferrer">here</a>.
+      A fun little exercise inspired by a passing interest in poker. The odds calculator package is on Github <a href="https://github.com/emileindik/poker-odds-machine" target="_blank" rel="noopener noreferrer">here</a>.
     </p>
     <br>
     <div class="pokerContainer">
@@ -26,30 +26,30 @@
         <input type="text" name="hands" placeholder="ex: Ac,4d Kc,Js"><br><br>
 
         <label for="numPlayers">numPlayers:</label><br>
-        <input type="text" name="numPlayers" placeholder="Defaults to # of hands"><br><br>
+        <input type="number" name="numPlayers" placeholder="Default: # of hands"><br><br>
 
         <hr><br>
 
         <label for="numDecks">numDecks:</label><br>
-        <input type="text" name="numDecks" placeholder="Defaults to 1"><br><br>
+        <input type="number" name="numDecks" placeholder="Default: 1"><br><br>
 
         <label for="handSize">handSize:</label><br>
-        <input type="text" name="handSize" placeholder="Defaults to 2"><br><br>
+        <input type="number" name="handSize" placeholder="Default: 2"><br><br>
 
         <label for="board">board:</label><br>
         <input type="text" name="board" placeholder="ex: 7h,8d,Kh"><br><br>
 
         <label for="boardSize">boardSize:</label><br>
-        <input type="text" name="boardSize" placeholder="Defaults to 5"><br><br>
+        <input type="number" name="boardSize" placeholder="Default: 5"><br><br>
 
         <label for="iterations">iterations:</label><br>
-        <input type="text" name="iterations" placeholder="Defaults to 1000"><br><br>
+        <input type="number" name="iterations" placeholder="Default: 1000"><br><br>
 
         <label for="returnHandStats">returnHandStats:</label><br>
-        <input type="text" name="returnHandStats" placeholder="Defaults to false"><br><br>
+        <input type="checkbox" name="returnHandStats" value="any" placeholder="Default: false"><br><br>
 
         <label for="returnTieHandStats">returnTieHandStats:</label><br>
-        <input type="text" name="returnTieHandStats" placeholder="Defaults to false"><br><br><br>
+        <input type="checkbox" name="returnTieHandStats" value="any" placeholder="Default: false"><br><br><br>
 
         <input type="submit">
       </form>
@@ -72,46 +72,42 @@
   </div>
 
 </div>
+<script src="../scripts/poker.js"></script>
 <script type="text/javascript">
 
   function process(event) {
     event.preventDefault();
 
-    const url = 'https://poker-odds.herokuapp.com/calculate?';
+    const booleanFields = ['returnHandStats', 'returnTieHandStats'];
     const inputs = document.getElementById('form').getElementsByTagName('input');
-    const args = [];
+    const args = {};
+
+    // console.log(inputs)
+    for (const e of inputs) {
+      console.log(e.name, e.value)
+    }
 
     for (const e of inputs) {
       if (e.value != '') {
         if (e.name === 'hands') {
-          const splitz = e.value.split(' ');
-          for (let i = 0; i < splitz.length; i++) {
-            args.push(`${e.name}[${i}]=${encodeURIComponent(splitz[i])}`);
-          }
+          args[e.name] = e.value.split(' ');
+        } else if (booleanFields.includes(e.name)) {
+          args[e.name] = e.checked;
         } else {
-          args.push(`${e.name}=${encodeURIComponent(e.value)}`);
+          args[e.name] = e.value;
         }
       }
     }
 
     const output = document.getElementById('output');
 
-    output.textContent = 'Loading...';
-
-    fetch(url + args.join('&'))
-    .then(res => {
-      return res.json();
-    })
-    .then(res => {
-      console.log(res)
-      if (res.error)
-        output.textContent = `Error: \n\t${res.error.substring(0, res.error.length).replace(/\\/g, '')}`;
-      else
-        output.textContent = JSON.stringify(res, null, 2);
-    })
-    .catch(err => {
+    try {
+      const c = new poker.Calculator(args);
+      const res = c.simulate();
+      output.textContent = JSON.stringify(res, null, 2);
+    } catch (err) {
       output.textContent = err;
-    });
+    }
   }
 
 </script>
